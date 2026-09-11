@@ -677,7 +677,7 @@ const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 // Everything animated starts from its finished state in CSS. This class turns
 // the entrance animations on, so a dead script leaves a readable page, not a
 // blank one.
-const ANIM = !reduce && "IntersectionObserver" in window;
+const ANIM = !reduce;
 if (ANIM) document.documentElement.classList.add("anim");
 
 const fmtDay  = d => new Intl.DateTimeFormat("en-US",{weekday:"long",month:"long",day:"numeric",timeZone:TZ}).format(d);
@@ -769,12 +769,28 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 
-/* ── row entrance observer ── */
-const rowIO = ANIM ? new IntersectionObserver(entries => {
-  entries.forEach(en => {
-    if (en.isIntersecting) { en.target.classList.add("in"); rowIO.unobserve(en.target); }
-  });
-}, { threshold: 0.05, rootMargin: "0px 0px -30px 0px" }) : null;
+/* ── reveal queue ──
+   A plain geometry check rather than IntersectionObserver: it runs from the
+   same scroll handler as everything else, and can be forced synchronously
+   after async renders, so nothing can stay stuck at opacity 0. */
+const revealQueue = [];
+function queueReveal(el) {
+  if (ANIM) revealQueue.push(el);
+  else { el.classList.add("in"); el.querySelectorAll("[data-count]").forEach(runCounter); }
+}
+function checkReveals() {
+  if (!ANIM) return;
+  const h = window.innerHeight;
+  for (let i = revealQueue.length - 1; i >= 0; i--) {
+    const el = revealQueue[i];
+    if (!el.isConnected) { revealQueue.splice(i, 1); continue; }
+    if (el.getBoundingClientRect().top < h - 40) {
+      el.classList.add("in");
+      el.querySelectorAll("[data-count]").forEach(runCounter);
+      revealQueue.splice(i, 1);
+    }
+  }
+}
 
 function render(animate) {
   if (!DATA) return;
@@ -879,10 +895,10 @@ function render(animate) {
       row.append(idx, mid, right);
       list.appendChild(row);
 
-      if (!ANIM || vi < 8) { requestAnimationFrame(() => row.classList.add("in")); }
-      else rowIO.observe(row);
+      queueReveal(row);
     });
     list.classList.remove("swap");
+    checkReveals();
   };
 
   if (animate && ANIM) {
@@ -894,7 +910,8 @@ function render(animate) {
 /* ── counters ── */
 function runCounter(el) {
   const target = parseFloat(el.dataset.count);
-  const dec = String(target).includes(".") ? 1 : 0;
+  // read precision off the authored string: parseFloat("7.0") stringifies to "7"
+  const dec = (el.dataset.count.split(".")[1] || "").length;
   const pre = el.dataset.prefix || "", suf = el.dataset.suffix || "";
   // Land on the real value first; the tween below only overwrites it while
   // frames are actually being served.
@@ -990,17 +1007,8 @@ document.addEventListener("keydown", e => {
 });
 
 /* ── reveals ── */
-const io = ANIM ? new IntersectionObserver(entries => {
-  entries.forEach(en => {
-    if (!en.isIntersecting) return;
-    en.target.classList.add("in");
-    en.target.querySelectorAll?.("[data-count]").forEach(runCounter);
-    io.unobserve(en.target);
-  });
-}, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }) : null;
-
-if (io) document.querySelectorAll(".rv, .media, .band, .split-img").forEach(el => io.observe(el));
-else document.querySelectorAll("[data-count]").forEach(runCounter);
+document.querySelectorAll(".rv, .media, .band, .split-img").forEach(queueReveal);
+checkReveals();
 
 /* ── scroll: progress, parallax, mini bar ── */
 const par = [...document.querySelectorAll("[data-par]")];
@@ -1016,6 +1024,8 @@ function onScroll() {
 
   const heroBottom = mediaEl.offsetTop + mediaEl.offsetHeight;
   mini.classList.toggle("show", y > heroBottom);
+
+  checkReveals();
 
   if (ANIM) {
     par.forEach(f => {
@@ -1042,6 +1052,7 @@ window.addEventListener("load", () => {
     document.body.classList.remove("locked");
     document.getElementById("heroTitle").classList.add("go");
     document.querySelector(".media-title").classList.add("go");
+    checkReveals();
     try { sessionStorage.setItem("bobIntro", "1"); } catch {}
     setTimeout(() => intro.remove(), 1000);
   };
@@ -1049,6 +1060,7 @@ window.addEventListener("load", () => {
     intro.remove();
     document.getElementById("heroTitle").classList.add("go");
     document.querySelector(".media-title").classList.add("go");
+    checkReveals();
   } else {
     document.body.classList.add("locked");
     setTimeout(lift, 620);
