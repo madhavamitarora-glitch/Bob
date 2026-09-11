@@ -11,8 +11,12 @@ share one SQLite database (`events.db`):
   events.
 - **The site** (`docs/index.html`) — a static, no-backend page (served free
   by GitHub Pages) listing upcoming events, searchable and filterable by
-  score. It reads `docs/events.json`, which the poller regenerates on every
-  run. Live at
+  score. Selecting an event opens its full detail — description, times,
+  organizer, and a ledger showing exactly which terms produced its score —
+  read from Bob's own stored copy rather than sending you off-site; the
+  Localist page is one further click if you want to verify or register. It
+  reads `docs/events.json`, which the poller regenerates on every run. Live
+  at
   [madhavamitarora-glitch.github.io/Bob](https://madhavamitarora-glitch.github.io/Bob/).
 
 Everything here is free, forever: a public GitHub repo (free Actions
