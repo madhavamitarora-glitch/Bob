@@ -3,544 +3,931 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bob — Purdue Events</title>
+<title>Bob — Campus Intelligence</title>
+<meta name="description" content="Every Purdue campus event that matches what you actually care about, scored and surfaced automatically.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    color-scheme: light dark;
-    --gold: #CFB991;
-    --gold-bright: #DAAA00;
-    --gold-dim: #8E6F3E;
-    --bg: #0a0a0a;
-    --bg-alt: #121212;
-    --card: #161616;
-    --card-hover: #1c1c1c;
-    --border: #2a2a2a;
-    --text: #f5f4f1;
-    --text-dim: #9c9994;
-    --text-faint: #6b6864;
-    --tier-high: #DAAA00;
-    --tier-medium: #6f9bd1;
-    --tier-low: #5a5652;
-    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.35);
-  }
-  @media (prefers-color-scheme: light) {
-    :root {
-      --bg: #faf8f4;
-      --bg-alt: #f2efe8;
-      --card: #ffffff;
-      --card-hover: #fffdf9;
-      --border: #e6e0d4;
-      --text: #1c1a16;
-      --text-dim: #6b6459;
-      --text-faint: #a39c8e;
-      --shadow: 0 1px 2px rgba(30,25,10,0.04), 0 8px 24px rgba(30,25,10,0.08);
-    }
+    --paper: #f7f7f4;
+    --paper-2: #efeee9;
+    --ink: #1a1a17;
+    --ink-solid: #26251d;
+    --ink-soft: #6e6d64;
+    --ink-faint: #a5a49b;
+    --rule: #dedcd4;
+    --dark: #0e0e0c;
+    --gold: #b08d3f;
+    --sans: 'Inter Tight', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
   }
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
     margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
   }
-  .display { font-family: 'Fraunces', Georgia, serif; }
+  a { color: inherit; text-decoration: none; }
 
-  /* ---------- Hero ---------- */
-  .hero {
-    position: relative;
-    padding: 4.5rem 1.5rem 2.5rem;
-    overflow: hidden;
-    background:
-      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(207,185,145,0.16), transparent 60%),
-      radial-gradient(ellipse 700px 400px at 100% 0%, rgba(111,155,209,0.08), transparent 55%),
-      var(--bg);
-    border-bottom: 1px solid var(--border);
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 0 28px; }
+  @media (max-width: 640px) { .wrap { padding: 0 18px; } }
+
+  .mono {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
   }
-  .hero-inner {
-    max-width: 780px;
-    margin: 0 auto;
-    position: relative;
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 0 18px;
   }
-  .mark {
+  .brand { display: flex; align-items: baseline; gap: 8px; }
+  .brand svg { width: 19px; height: 19px; display: block; align-self: center; }
+  .brand-name {
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -0.035em;
+  }
+  .brand-reg { font-size: 9px; color: var(--ink-faint); transform: translateY(-6px); display: inline-block; }
+  .topbar-right { display: flex; align-items: center; gap: 9px; }
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 0 rgba(176,141,63,0.6);
+    animation: pulse 2.4s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(176,141,63,0.5); }
+    70% { box-shadow: 0 0 0 7px rgba(176,141,63,0); }
+    100% { box-shadow: 0 0 0 0 rgba(176,141,63,0); }
+  }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 34px 0 30px; }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0,1.35fr) minmax(0,1fr);
+    gap: 40px;
+    align-items: start;
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(38px, 6.6vw, 82px);
+    font-weight: 500;
+    line-height: 0.97;
+    letter-spacing: -0.035em;
+  }
+  .hero-side {
+    padding-left: 26px;
+    border-left: 1px solid var(--rule);
+    align-self: end;
+    padding-bottom: 6px;
+  }
+  .hero-side p {
+    margin: 0 0 18px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 38ch;
+  }
+  @media (max-width: 820px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 26px; }
+    .hero-side { border-left: 0; border-top: 1px solid var(--rule); padding-left: 0; padding-top: 18px; }
+  }
+
+  .pill {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: linear-gradient(155deg, var(--gold), var(--gold-dim));
-    color: #16130a;
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 1.3rem;
-    margin-bottom: 1.1rem;
-    box-shadow: 0 4px 18px rgba(207,185,145,0.25);
+    gap: 8px;
+    background: var(--ink-solid);
+    color: #fff;
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    padding: 11px 19px;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
   }
-  h1.display {
-    margin: 0 0 0.5rem;
-    font-size: clamp(2.1rem, 5vw, 3rem);
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    line-height: 1.08;
+  .pill:hover { opacity: 0.82; }
+  .pill.ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--rule);
   }
-  h1.display em {
-    font-style: italic;
-    font-weight: 500;
-    color: var(--gold-dim);
+  .pill.ghost:hover { border-color: var(--ink); opacity: 1; }
+
+  /* ---------- full-bleed media ---------- */
+  .media {
+    position: relative;
+    margin-top: 8px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--dark);
+    aspect-ratio: 1920 / 900;
+    min-height: 380px;
   }
-  .tagline {
-    color: var(--text-dim);
-    font-size: 1.02rem;
-    max-width: 46ch;
-    line-height: 1.55;
-    margin: 0 0 1.9rem;
+  .media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.62) saturate(0.85) contrast(1.05);
   }
-  .stats {
+  .media-veil {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(10,10,8,0.45) 0%, rgba(10,10,8,0.08) 38%, rgba(10,10,8,0.72) 100%);
+  }
+  .hud { position: absolute; inset: 0; color: rgba(255,255,255,0.88); }
+  .hud .mono { color: rgba(255,255,255,0.78); }
+  .hud-tl { position: absolute; top: 18px; left: 20px; }
+  .hud-tr { position: absolute; top: 18px; right: 20px; text-align: right; }
+  .hud-dash {
+    position: absolute;
+    left: 0; right: 0; top: 52%;
+    border-top: 1px dashed rgba(255,255,255,0.3);
+  }
+  .hud-box {
+    position: absolute;
+    left: 8%;
+    top: 56%;
+    width: 132px;
+    height: 74px;
+  }
+  .hud-box span {
+    position: absolute;
+    width: 13px; height: 13px;
+    border: 1px solid rgba(255,255,255,0.75);
+  }
+  .hud-box span:nth-child(1) { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+  .hud-box span:nth-child(2) { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+  .hud-box span:nth-child(3) { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+  .hud-box span:nth-child(4) { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+  .hud-box .readout {
+    position: absolute;
+    inset: 0;
     display: flex;
-    gap: 0.6rem;
-    flex-wrap: wrap;
-    margin-bottom: 1.8rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 17px;
+    letter-spacing: 0.04em;
+    color: #fff;
   }
-  .stat {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 0.65rem 0.95rem;
-    min-width: 108px;
+  .hud-box .readout small {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.65);
+    margin-top: 3px;
   }
-  .stat-num {
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: 1.35rem;
-    line-height: 1.1;
-    color: var(--gold-dim);
+  .media-title {
+    position: absolute;
+    left: 0; right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+    color: #fff;
+    font-size: clamp(21px, 3.3vw, 40px);
+    font-weight: 500;
+    letter-spacing: -0.028em;
+    padding: 0 20px;
+    text-shadow: 0 2px 30px rgba(0,0,0,0.35);
   }
-  .stat-label {
-    font-size: 0.72rem;
-    color: var(--text-faint);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-top: 0.15rem;
+  .media-bar {
+    position: absolute;
+    left: 14px; right: 14px; bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 9px 9px 9px 18px;
+    background: rgba(240,239,233,0.82);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 999px;
+    color: var(--ink);
+  }
+  .media-bar-text {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .media-bar .pill { padding: 9px 17px; flex-shrink: 0; }
+  @media (max-width: 700px) {
+    /* the two corner readouts collide once the frame narrows */
+    .hud-detail { display: none; }
+  }
+  @media (max-width: 640px) {
+    .media { aspect-ratio: 4/5; min-height: 0; }
+    .hud-box { left: 6%; width: 112px; }
+    .media-bar { left: 10px; right: 10px; bottom: 10px; padding: 7px 7px 7px 14px; }
+    .media-bar-text { font-size: 12px; }
   }
 
-  /* ---------- Controls ---------- */
-  .controls {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    display: flex;
-    gap: 0.55rem;
-    flex-wrap: wrap;
-    align-items: center;
-    padding: 0.85rem 1.5rem;
-    background: color-mix(in srgb, var(--bg) 88%, transparent);
-    backdrop-filter: blur(14px) saturate(1.4);
-    -webkit-backdrop-filter: blur(14px) saturate(1.4);
-    border-bottom: 1px solid var(--border);
+  /* ---------- marquee ---------- */
+  .marquee {
+    margin-top: 34px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    overflow: hidden;
+    padding: 13px 0;
   }
-  .controls-inner {
-    max-width: 780px;
-    margin: 0 auto;
-    width: 100%;
+  .marquee-track {
     display: flex;
-    gap: 0.55rem;
+    width: max-content;
+    animation: slide 44s linear infinite;
+  }
+  .marquee:hover .marquee-track { animation-play-state: paused; }
+  @keyframes slide { to { transform: translateX(-50%); } }
+  .marquee-item {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    white-space: nowrap;
+  }
+  .marquee-item::after { content: ""; width: 3px; height: 3px; border-radius: 50%; background: var(--ink-faint); }
+
+  /* ---------- sections ---------- */
+  section { padding: 74px 0 0; }
+  .sec-head {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) minmax(0,1.1fr);
+    gap: 40px;
+    align-items: end;
+    padding-bottom: 30px;
+  }
+  .sec-head h2 {
+    margin: 10px 0 0;
+    font-size: clamp(27px, 3.9vw, 48px);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.032em;
+  }
+  .sec-head p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 44ch;
+  }
+  @media (max-width: 820px) { .sec-head { grid-template-columns: 1fr; gap: 18px; align-items: start; } }
+
+  /* ---------- controls ---------- */
+  .controls {
+    display: flex;
+    gap: 10px;
     flex-wrap: wrap;
     align-items: center;
+    padding: 16px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 4px;
   }
   input[type="search"] {
-    flex: 1 1 200px;
-    padding: 0.6rem 0.9rem;
+    flex: 1 1 210px;
+    min-width: 0;
+    padding: 10px 16px;
     border-radius: 999px;
-    border: 1px solid var(--border);
-    background: var(--card);
-    color: var(--text);
-    font-size: 0.9rem;
-    font-family: inherit;
-    outline: none;
-    transition: border-color 0.15s ease;
-  }
-  input[type="search"]:focus { border-color: var(--gold-dim); }
-  input[type="search"]::placeholder { color: var(--text-faint); }
-
-  .pills {
-    display: flex;
-    gap: 0.35rem;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 0.22rem;
-  }
-  .pill {
-    border: none;
+    border: 1px solid var(--rule);
     background: transparent;
-    color: var(--text-dim);
-    font-family: inherit;
-    font-size: 0.82rem;
-    font-weight: 500;
-    padding: 0.42rem 0.85rem;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.18s ease;
+  }
+  input[type="search"]:focus { border-color: var(--ink); }
+  input[type="search"]::placeholder { color: var(--ink-faint); }
+  .seg { display: flex; gap: 4px; background: var(--paper-2); border-radius: 999px; padding: 3px; }
+  .seg button {
+    border: 0;
+    background: transparent;
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--ink-soft);
+    padding: 8px 15px;
     border-radius: 999px;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition: background 0.18s ease, color 0.18s ease;
   }
-  .pill:hover { color: var(--text); }
-  .pill.active {
-    background: linear-gradient(155deg, var(--gold), var(--gold-dim));
-    color: #16130a;
-    font-weight: 600;
-  }
+  .seg button:hover { color: var(--ink); }
+  .seg button.on { background: var(--ink-solid); color: #fff; }
 
-  /* ---------- Main / timeline ---------- */
-  main {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 0.5rem 1.5rem 4rem;
-  }
-  .day-heading {
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: var(--text);
-    padding: 1.3rem 0 0.7rem;
+  /* ---------- event rows ---------- */
+  .daymark {
     display: flex;
     align-items: baseline;
-    gap: 0.5rem;
+    gap: 14px;
+    padding: 30px 0 10px;
   }
-  .day-heading .rel {
-    font-family: 'Inter', sans-serif;
+  .daymark .line { flex: 1; height: 1px; background: var(--rule); }
+  .row {
+    display: grid;
+    grid-template-columns: 42px minmax(0,1fr) auto;
+    gap: 22px;
+    align-items: start;
+    padding: 19px 0;
+    border-top: 1px solid var(--rule);
+    transition: background 0.2s ease, padding-left 0.2s ease;
+  }
+  .row:hover { background: rgba(0,0,0,0.017); padding-left: 8px; }
+  .row-idx { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); padding-top: 4px; }
+  .row-title {
+    font-size: clamp(17px, 2vw, 22px);
     font-weight: 500;
-    font-size: 0.72rem;
-    color: var(--gold-dim);
+    letter-spacing: -0.022em;
+    line-height: 1.18;
+  }
+  .row-meta {
+    margin-top: 7px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.07em;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: rgba(207,185,145,0.12);
-    padding: 0.15rem 0.5rem;
+    color: var(--ink-soft);
+  }
+  .row-tags { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border: 1px solid var(--rule);
     border-radius: 999px;
+    color: var(--ink-soft);
+  }
+  .chip.hi { border-color: rgba(176,141,63,0.5); color: var(--gold); }
+  .chip.soon { border-color: rgba(176,60,40,0.35); color: #a8402c; }
+  .row-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; padding-top: 2px; }
+  .score { font-family: var(--mono); font-size: 13px; color: var(--ink); }
+  .score-bar { width: 46px; height: 2px; background: var(--rule); position: relative; }
+  .score-bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--gold); }
+  .row-arrow { font-size: 15px; color: var(--ink-faint); transition: transform 0.2s ease, color 0.2s ease; }
+  .row:hover .row-arrow { transform: translate(3px,-3px); color: var(--ink); }
+  @media (max-width: 640px) {
+    .row { grid-template-columns: 26px minmax(0,1fr); gap: 14px; }
+    .row-right { grid-column: 2; flex-direction: row; align-items: center; justify-content: flex-start; gap: 12px; }
   }
 
-  .card {
-    position: relative;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 0.95rem 1.1rem 0.95rem 1.3rem;
-    margin-bottom: 0.55rem;
-    text-decoration: none;
-    color: inherit;
-    display: block;
-    box-shadow: var(--shadow);
-    transition: transform 0.18s cubic-bezier(.2,.8,.2,1), border-color 0.18s ease, background 0.18s ease;
-    opacity: 0;
-    transform: translateY(8px);
-    animation: rise 0.5s cubic-bezier(.2,.8,.2,1) forwards;
-  }
-  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
-  .card::before {
-    content: "";
-    position: absolute;
-    left: 0; top: 0.55rem; bottom: 0.55rem;
-    width: 3px;
+  .notice {
+    margin: 20px 0;
+    padding: 15px 18px;
+    border: 1px solid rgba(176,60,40,0.3);
+    background: rgba(176,60,40,0.05);
+    color: #a8402c;
+    font-size: 13px;
     border-radius: 3px;
-    background: var(--tier-color, var(--tier-low));
   }
-  .card:hover {
-    transform: translateY(-2px);
-    border-color: var(--gold-dim);
-    background: var(--card-hover);
+  .empty { padding: 60px 0; text-align: center; color: var(--ink-soft); font-size: 14px; }
+  .skel { height: 76px; border-top: 1px solid var(--rule); opacity: 0.5; }
+
+  /* ---------- media band ---------- */
+  .band {
+    position: relative;
+    margin-top: 74px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--dark);
+    aspect-ratio: 21/8;
+    min-height: 260px;
+    display: flex;
+    align-items: center;
   }
-  .card-top {
+  .band img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.5) saturate(0.85);
+  }
+  .band-veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, rgba(10,10,8,0.72) 0%, rgba(10,10,8,0.25) 70%);
+  }
+  .band-inner { position: relative; padding: 0 clamp(22px, 5vw, 64px); color: #fff; }
+  .band-inner .mono { color: rgba(255,255,255,0.7); }
+  .band-inner p {
+    margin: 12px 0 0;
+    font-size: clamp(20px, 2.9vw, 36px);
+    font-weight: 500;
+    line-height: 1.14;
+    letter-spacing: -0.03em;
+    max-width: 22ch;
+  }
+  @media (max-width: 640px) { .band { aspect-ratio: 3/2; } .band-inner p { max-width: 100%; } }
+
+  /* ---------- signal / method ---------- */
+  .method {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+  .method div { background: var(--paper); padding: 26px 22px 30px; }
+  .method .n {
+    font-size: 38px;
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .method p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ink-soft); }
+  @media (max-width: 860px) { .method { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  @media (max-width: 460px) { .method { grid-template-columns: 1fr; } }
+
+  /* ---------- split block ---------- */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0,0.85fr) minmax(0,1fr);
+    gap: 44px;
+    align-items: center;
+    margin-top: 74px;
+  }
+  .split-img {
+    position: relative;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--dark);
+    aspect-ratio: 4/5;
+  }
+  .split-img img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.78) saturate(0.9); }
+  .split-img .tag {
+    position: absolute;
+    left: 14px; bottom: 14px;
+    background: rgba(240,239,233,0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 6px 13px;
+    border-radius: 999px;
+  }
+  .split h3 {
+    margin: 14px 0 16px;
+    font-size: clamp(24px, 3.2vw, 40px);
+    font-weight: 500;
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+  }
+  .split p { margin: 0 0 14px; font-size: 14px; line-height: 1.6; color: var(--ink-soft); max-width: 50ch; }
+  .split ul { margin: 20px 0 0; padding: 0; list-style: none; }
+  .split li {
+    display: flex; gap: 14px;
+    padding: 13px 0;
+    border-top: 1px solid var(--rule);
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+  .split li b { color: var(--ink); font-weight: 500; flex-shrink: 0; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; padding-top: 2px; }
+  @media (max-width: 820px) { .split { grid-template-columns: 1fr; gap: 26px; } .split-img { aspect-ratio: 16/10; } }
+
+  /* ---------- footer ---------- */
+  footer { margin-top: 86px; border-top: 1px solid var(--rule); padding: 40px 0 46px; }
+  .foot-grid {
+    display: grid;
+    grid-template-columns: minmax(0,1.6fr) repeat(3, minmax(0,1fr));
+    gap: 34px;
+  }
+  .foot-grid h4 { margin: 0 0 14px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); font-weight: 400; }
+  .foot-grid a, .foot-grid li { display: block; font-size: 13px; color: var(--ink-soft); padding: 4px 0; }
+  .foot-grid a:hover { color: var(--ink); }
+  .foot-grid ul { margin: 0; padding: 0; list-style: none; }
+  .foot-bottom {
     display: flex;
     justify-content: space-between;
-    gap: 0.75rem;
-    align-items: baseline;
-  }
-  .card-title {
-    font-weight: 600;
-    font-size: 0.98rem;
-    line-height: 1.35;
-  }
-  .card-time {
-    flex-shrink: 0;
-    font-size: 0.78rem;
-    color: var(--text-faint);
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-  }
-  .card-location {
-    font-size: 0.84rem;
-    color: var(--text-dim);
-    margin-top: 0.25rem;
-  }
-  .tags {
-    margin-top: 0.55rem;
-    display: flex;
     flex-wrap: wrap;
-    gap: 0.32rem;
+    gap: 12px;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
   }
-  .tag {
-    font-size: 0.7rem;
-    font-weight: 500;
-    padding: 0.14rem 0.55rem;
-    border-radius: 999px;
-    background: rgba(218,170,0,0.12);
-    color: var(--tier-high);
-    border: 1px solid rgba(218,170,0,0.28);
-  }
-  .tag.medium {
-    background: rgba(111,155,209,0.1);
-    color: var(--tier-medium);
-    border-color: rgba(111,155,209,0.26);
-  }
-  .tag.soon {
-    background: rgba(214,90,60,0.12);
-    color: #d65a3c;
-    border-color: rgba(214,90,60,0.3);
-  }
+  .credit { font-size: 11px; color: var(--ink-faint); line-height: 1.6; max-width: 60ch; }
+  .credit a { text-decoration: underline; text-underline-offset: 2px; }
+  @media (max-width: 760px) { .foot-grid { grid-template-columns: 1fr 1fr; } }
 
-  .empty, .stale {
-    text-align: center;
-    padding: 2.5rem 1rem;
-    color: var(--text-dim);
-    font-size: 0.9rem;
+  /* ---------- reveal ---------- */
+  .rv { opacity: 0; transform: translateY(16px); transition: opacity 0.85s cubic-bezier(.22,.61,.36,1), transform 0.85s cubic-bezier(.22,.61,.36,1); }
+  .rv.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .rv { opacity: 1; transform: none; transition: none; }
+    .marquee-track { animation: none; }
+    .live-dot { animation: none; }
   }
-  .stale {
-    background: rgba(214,90,60,0.1);
-    border: 1px solid rgba(214,90,60,0.28);
-    border-radius: 12px;
-    margin: 1.2rem 0;
-    color: #d65a3c;
-    text-align: left;
-    padding: 0.85rem 1.1rem;
-  }
-
-  /* skeleton loading */
-  .skeleton-card {
-    height: 84px;
-    border-radius: 14px;
-    margin-bottom: 0.55rem;
-    background: linear-gradient(100deg, var(--card) 30%, var(--card-hover) 50%, var(--card) 70%);
-    background-size: 200% 100%;
-    animation: shimmer 1.4s ease-in-out infinite;
-    border: 1px solid var(--border);
-  }
-  @keyframes shimmer { to { background-position: -200% 0; } }
-
-  footer {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 2rem 1.5rem 3rem;
-    color: var(--text-faint);
-    font-size: 0.78rem;
-    text-align: center;
-    line-height: 1.6;
-  }
-  footer a { color: var(--text-dim); }
 </style>
 </head>
 <body>
 
-<div class="hero">
-  <div class="hero-inner">
-    <div class="mark">B</div>
-    <h1 class="display">Bob <em>— your Purdue radar</em></h1>
-    <p class="tagline">Every campus event that matches what you actually care about, scored and surfaced automatically. No feeds to check, nothing to miss.</p>
-    <div class="stats" id="stats">
-      <div class="stat"><div class="stat-num">—</div><div class="stat-label">upcoming</div></div>
-      <div class="stat"><div class="stat-num">—</div><div class="stat-label">notify-worthy</div></div>
-      <div class="stat"><div class="stat-num">—</div><div class="stat-label">next event</div></div>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M2 21 L12 3 L22 21 Z" fill="#1a1a17"/>
+        <circle cx="12" cy="16" r="2.6" fill="#f7f7f4"/>
+      </svg>
+      <span class="brand-name">Bob</span><span class="brand-reg">®</span>
+    </div>
+    <div class="topbar-right">
+      <span class="live-dot"></span>
+      <span class="mono" id="topStatus">Localist · Live</span>
     </div>
   </div>
 </div>
 
-<div class="controls">
-  <div class="controls-inner">
-    <input type="search" id="search" placeholder="Search events, locations, topics…">
-    <div class="pills" id="pills" role="group" aria-label="Filter by score">
-      <button class="pill" data-min="0">All</button>
-      <button class="pill" data-min="1">Medium+</button>
-      <button class="pill active" data-min="3">Notify-worthy</button>
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-grid">
+      <h1 class="rv">Campus Intelligence<br>Without The Noise</h1>
+      <div class="hero-side rv">
+        <p>Bob watches the entire Purdue events feed, scores every listing against a hand-tuned interest list, and surfaces only what's worth your attention — twice a day, automatically.</p>
+        <a class="pill" href="#feed">View the feed</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="media rv">
+    <img src="img/hero-fountain.jpg" alt="The Engineering Fountain at Purdue University">
+    <div class="media-veil"></div>
+    <div class="hud">
+      <div class="hud-tl mono"><span class="hud-detail">40.4237° N&nbsp;&nbsp;86.9212° W<br></span>West Lafayette — IN</div>
+      <div class="hud-tr mono" id="hudFeed">Feed · Synced</div>
+      <div class="hud-dash"></div>
+      <div class="hud-box">
+        <span></span><span></span><span></span><span></span>
+        <div class="readout"><em style="font-style:normal" id="hudScore">—</em><small>Top Score</small></div>
+      </div>
+    </div>
+    <div class="media-title">Nothing worth knowing, missed.</div>
+    <div class="media-bar">
+      <div class="media-bar-text" id="nextText">Loading the next event…</div>
+      <a class="pill" id="nextLink" href="#feed">Open</a>
     </div>
   </div>
 </div>
 
-<main id="main">
-  <div class="skeleton-card"></div>
-  <div class="skeleton-card"></div>
-  <div class="skeleton-card"></div>
-</main>
+<div class="wrap">
+  <div class="marquee rv">
+    <div class="marquee-track" id="marquee"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section id="feed">
+    <div class="sec-head rv">
+      <div>
+        <div class="mono">The Feed</div>
+        <h2>What's coming<br>up on campus</h2>
+      </div>
+      <p>Everything below was pulled from the public Purdue Localist feed and scored locally — no model, no guesswork. High-value terms are worth three points, secondary terms one, and anything starting within 48 hours is multiplied by 1.5.</p>
+    </div>
+
+    <div class="controls rv">
+      <input type="search" id="search" placeholder="Search events, locations, topics…">
+      <div class="seg" id="seg">
+        <button data-min="0">All</button>
+        <button data-min="1">Medium+</button>
+        <button data-min="3" class="on">Notify-worthy</button>
+      </div>
+    </div>
+
+    <div id="list">
+      <div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>
+    </div>
+  </section>
+
+  <div class="band rv">
+    <img src="img/armstrong.jpg" alt="Neil Armstrong Hall of Engineering at Purdue University" loading="lazy">
+    <div class="band-veil"></div>
+    <div class="band-inner">
+      <div class="mono">Purdue — West Lafayette</div>
+      <p><span id="bandCount">Hundreds of</span> listings in the next sixty days.<br>Most of them were never meant for you.</p>
+    </div>
+  </div>
+
+  <section id="signal">
+    <div class="sec-head rv">
+      <div>
+        <div class="mono">The Signal</div>
+        <h2>How a listing<br>earns your attention</h2>
+      </div>
+      <p>Scoring is deliberately plain Python — string and regex matching against terms you edit by hand. Every event stores exactly which terms fired, so when a notification feels wrong you can see why and retune it in seconds.</p>
+    </div>
+    <div class="method rv">
+      <div>
+        <div class="n">3</div>
+        <p>Points for a high-value term — robotics, career fair, internship, research, hackathon, co-op.</p>
+      </div>
+      <div>
+        <div class="n">1</div>
+        <p>Point for a secondary term — machine learning, scholarship, grant, guest lecture, free food.</p>
+      </div>
+      <div>
+        <div class="n">1.5×</div>
+        <p>Multiplier applied when an event starts inside the next 48 hours and still needs a decision.</p>
+      </div>
+      <div>
+        <div class="n">≥3</div>
+        <p>The threshold that triggers a push to your phone. Below it, everything is still stored and searchable.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="loop" style="padding-top:0">
+    <div class="split">
+      <div class="split-img rv">
+        <img src="img/belltower.jpg" alt="The Purdue Bell Tower" loading="lazy">
+        <div class="tag mono">Twice Daily</div>
+      </div>
+      <div class="rv">
+        <div class="mono">The Loop</div>
+        <h3>It runs whether<br>you open it or not</h3>
+        <p>A scheduled job fetches the feed, rescores every stored event against your current interest list, and pushes a single batched notification for anything new that clears the threshold. On a quiet day it sends nothing — silence is the correct output.</p>
+        <ul>
+          <li><b>01</b><span>Fetches the full Localist feed twice a day, at roughly 7am and 5pm Eastern.</span></li>
+          <li><b>02</b><span>Rescores everything stored, so editing your interest list retunes past events immediately.</span></li>
+          <li><b>03</b><span>Batches up to five new matches into one notification, never five separate buzzes.</span></li>
+          <li><b>04</b><span>Marks what it sent, so the same event never reaches you twice.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
 
 <footer>
-  Data from the public Purdue Localist feed, scored against a hand-tuned interest list — no LLM involved, refreshed automatically twice daily.<br>
-  <a href="https://github.com/madhavamitarora-glitch/Bob" target="_blank" rel="noopener">View source on GitHub</a>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand" style="margin-bottom:12px">
+          <svg viewBox="0 0 24 24" fill="none" width="19" height="19" aria-hidden="true">
+            <path d="M2 21 L12 3 L22 21 Z" fill="#1a1a17"/>
+            <circle cx="12" cy="16" r="2.6" fill="#f7f7f4"/>
+          </svg>
+          <span class="brand-name">Bob</span>
+        </div>
+        <p style="margin:0;font-size:13px;color:var(--ink-soft);max-width:34ch">A personal campus assistant for Purdue West Lafayette. Free to build, free to run, forever.</p>
+      </div>
+      <div>
+        <h4>Source</h4>
+        <a href="https://github.com/madhavamitarora-glitch/Bob" target="_blank" rel="noopener">Repository</a>
+        <a href="https://github.com/madhavamitarora-glitch/Bob/blob/main/interests.yaml" target="_blank" rel="noopener">Interest list</a>
+        <a href="https://github.com/madhavamitarora-glitch/Bob/actions" target="_blank" rel="noopener">Run history</a>
+      </div>
+      <div>
+        <h4>Feed</h4>
+        <a href="https://events.purdue.edu" target="_blank" rel="noopener">Purdue Localist</a>
+        <a href="https://ntfy.sh" target="_blank" rel="noopener">ntfy.sh</a>
+        <a href="events.json">Raw data</a>
+      </div>
+      <div>
+        <h4>Index</h4>
+        <ul>
+          <li id="footCount">—</li>
+          <li id="footUpdated">—</li>
+          <li>West Lafayette — IN</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div class="credit">
+        Campus photography by Julian Herzog, licensed
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>,
+        via <a href="https://commons.wikimedia.org/" target="_blank" rel="noopener">Wikimedia Commons</a>.
+        Event data from the public Purdue Localist API. Not affiliated with Purdue University.
+      </div>
+      <div class="mono">©&nbsp;26</div>
+    </div>
+  </div>
 </footer>
 
 <script>
-const LOCAL_TZ = "America/New_York";
-const STALE_AFTER_HOURS = 18;
+const TZ = "America/New_York";
+const STALE_HOURS = 18;
 
-const fmtDay = d => new Intl.DateTimeFormat("en-US", { weekday: "long", month: "short", day: "numeric", timeZone: LOCAL_TZ }).format(d);
-const fmtTime = d => new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone: LOCAL_TZ }).format(d).toLowerCase().replace(" ", "");
+const fmtDay  = d => new Intl.DateTimeFormat("en-US", { weekday:"long", month:"long", day:"numeric", timeZone:TZ }).format(d);
+const fmtTime = d => new Intl.DateTimeFormat("en-US", { hour:"numeric", minute:"2-digit", timeZone:TZ }).format(d).toLowerCase().replace(" ","");
 
 function relDay(d) {
-  const now = new Date();
-  const startOfDay = x => new Date(x.getFullYear(), x.getMonth(), x.getDate());
-  const diffDays = Math.round((startOfDay(d) - startOfDay(now)) / 86400000);
-  if (diffDays === 0) return "Today";
-  if (diffDays === 1) return "Tomorrow";
-  if (diffDays > 1 && diffDays < 7) return `In ${diffDays} days`;
+  const sod = x => new Date(x.getFullYear(), x.getMonth(), x.getDate());
+  const n = Math.round((sod(d) - sod(new Date())) / 86400000);
+  if (n === 0) return "Today";
+  if (n === 1) return "Tomorrow";
+  if (n > 1 && n < 7) return `In ${n} days`;
   return null;
 }
-
-function relTime(msFromNow) {
-  const hrs = msFromNow / 3600000;
-  if (hrs < 1) return `${Math.max(1, Math.round(msFromNow / 60000))}m`;
-  if (hrs < 24) return `${Math.round(hrs)}h`;
-  return `${Math.round(hrs / 24)}d`;
+function relTime(ms) {
+  const h = ms / 3600000;
+  if (h < 1) return `${Math.max(1, Math.round(ms/60000))} min`;
+  if (h < 24) return `${Math.round(h)} hr`;
+  return `${Math.round(h/24)} days`;
 }
+const cleanTerms = s => (s || "").split(",").map(t => t.trim())
+  .filter(t => t && !t.startsWith("mute:") && !t.startsWith("deadline-proximity"));
 
-let currentData = null;
-let minScore = 3;
+let DATA = null, minScore = 3;
 
 function render() {
-  const main = document.getElementById("main");
-  const search = document.getElementById("search").value.trim().toLowerCase();
-  const data = currentData;
-  if (!data) return;
-
+  if (!DATA) return;
+  const list = document.getElementById("list");
+  const q = document.getElementById("search").value.trim().toLowerCase();
   const now = Date.now();
-  const events = data.events
+
+  const events = DATA.events
     .filter(e => e.score >= minScore)
-    .filter(e => !search ||
-      e.title.toLowerCase().includes(search) ||
-      (e.description || "").toLowerCase().includes(search) ||
-      (e.location || "").toLowerCase().includes(search));
+    .filter(e => !q || e.title.toLowerCase().includes(q)
+      || (e.description||"").toLowerCase().includes(q)
+      || (e.location||"").toLowerCase().includes(q));
 
-  // stats
-  const statEls = document.querySelectorAll(".stat-num");
-  statEls[0].textContent = data.events.length;
-  statEls[1].textContent = data.events.filter(e => e.score >= 3).length;
-  const nextEv = data.events.find(e => e.start_utc && new Date(e.start_utc).getTime() > now);
-  statEls[2].textContent = nextEv ? relTime(new Date(nextEv.start_utc).getTime() - now) : "—";
+  list.innerHTML = "";
 
-  main.innerHTML = "";
-
-  const genAt = new Date(data.generated_at);
-  const ageHours = (now - genAt.getTime()) / 3600000;
-  if (ageHours > STALE_AFTER_HOURS) {
-    const stale = document.createElement("div");
-    stale.className = "stale";
-    stale.textContent = `Data last refreshed ${Math.round(ageHours)}h ago — the poller may not have run recently. Check the GitHub Actions tab.`;
-    main.appendChild(stale);
+  const age = (now - new Date(DATA.generated_at).getTime()) / 3600000;
+  if (age > STALE_HOURS) {
+    const n = document.createElement("div");
+    n.className = "notice";
+    n.textContent = `This data was last refreshed ${Math.round(age)} hours ago. The scheduled job may not have run — check the run history.`;
+    list.appendChild(n);
   }
 
-  if (events.length === 0) {
-    const empty = document.createElement("p");
-    empty.className = "empty";
-    empty.textContent = "Nothing matches right now — try a broader filter.";
-    main.appendChild(empty);
+  if (!events.length) {
+    const e = document.createElement("div");
+    e.className = "empty";
+    e.textContent = "Nothing matches that. Try a wider filter.";
+    list.appendChild(e);
     return;
   }
 
-  let lastDay = null, delay = 0;
+  let lastDay = null, i = 0;
   for (const ev of events) {
-    if (ev.start_utc) {
-      const start = new Date(ev.start_utc);
-      const dayKey = fmtDay(start);
-      if (dayKey !== lastDay) {
-        const heading = document.createElement("div");
-        heading.className = "day-heading";
+    const start = ev.start_utc ? new Date(ev.start_utc) : null;
+    if (start) {
+      const key = fmtDay(start);
+      if (key !== lastDay) {
+        const mark = document.createElement("div");
+        mark.className = "daymark";
         const rel = relDay(start);
-        heading.innerHTML = rel
-          ? `${dayKey} <span class="rel">${rel}</span>`
-          : dayKey;
-        main.appendChild(heading);
-        lastDay = dayKey;
-        delay = 0;
+        mark.innerHTML = `<span class="mono">${key}</span><span class="line"></span>` +
+                         (rel ? `<span class="mono">${rel}</span>` : "");
+        list.appendChild(mark);
+        lastDay = key;
       }
     }
 
-    const card = document.createElement("a");
-    card.className = "card";
-    card.style.animationDelay = `${Math.min(delay * 35, 250)}ms`;
-    delay++;
-    card.href = ev.url || "#";
-    card.target = "_blank";
-    card.rel = "noopener";
-    card.style.setProperty("--tier-color",
-      ev.score >= 3 ? "var(--tier-high)" : ev.score >= 1 ? "var(--tier-medium)" : "var(--tier-low)");
+    i++;
+    const row = document.createElement("a");
+    row.className = "row";
+    row.href = ev.url || "#";
+    row.target = "_blank";
+    row.rel = "noopener";
 
-    const top = document.createElement("div");
-    top.className = "card-top";
+    const idx = document.createElement("div");
+    idx.className = "row-idx";
+    idx.textContent = String(i).padStart(2, "0");
+
+    const mid = document.createElement("div");
     const title = document.createElement("div");
-    title.className = "card-title";
+    title.className = "row-title";
     title.textContent = ev.title;
-    top.appendChild(title);
+    mid.appendChild(title);
 
-    if (ev.start_utc) {
-      const time = document.createElement("div");
-      time.className = "card-time";
-      time.textContent = fmtTime(new Date(ev.start_utc));
-      top.appendChild(time);
-    }
-    card.appendChild(top);
-
-    if (ev.location) {
-      const loc = document.createElement("div");
-      loc.className = "card-location";
-      loc.textContent = ev.location;
-      card.appendChild(loc);
-    }
+    const meta = document.createElement("div");
+    meta.className = "row-meta";
+    meta.textContent = [start ? fmtTime(start) : "Time TBD", ev.location || "Location TBD"].join("  ·  ");
+    mid.appendChild(meta);
 
     const tags = document.createElement("div");
-    tags.className = "tags";
-
-    if (ev.start_utc) {
-      const msUntil = new Date(ev.start_utc).getTime() - now;
-      if (msUntil > 0 && msUntil <= 48 * 3600000) {
-        const soon = document.createElement("span");
-        soon.className = "tag soon";
-        soon.textContent = `in ${relTime(msUntil)}`;
-        tags.appendChild(soon);
+    tags.className = "row-tags";
+    if (start) {
+      const until = start.getTime() - now;
+      if (until > 0 && until <= 48*3600000) {
+        const c = document.createElement("span");
+        c.className = "chip soon";
+        c.textContent = `in ${relTime(until)}`;
+        tags.appendChild(c);
       }
     }
+    cleanTerms(ev.matched_terms).forEach(t => {
+      const c = document.createElement("span");
+      c.className = "chip" + (t.startsWith("high:") ? " hi" : "");
+      c.textContent = t.replace(/^high:|^medium:/, "");
+      tags.appendChild(c);
+    });
+    if (tags.children.length) mid.appendChild(tags);
 
-    if (ev.matched_terms) {
-      ev.matched_terms.split(",").forEach(raw => {
-        const t = raw.trim();
-        if (!t || t.startsWith("mute:") || t.startsWith("deadline-proximity")) return;
-        const tag = document.createElement("span");
-        tag.className = "tag" + (t.startsWith("medium:") ? " medium" : "");
-        tag.textContent = t.replace(/^high:|^medium:/, "");
-        tags.appendChild(tag);
-      });
-    }
-    if (tags.children.length) card.appendChild(tags);
+    const right = document.createElement("div");
+    right.className = "row-right";
+    const sc = document.createElement("div");
+    sc.className = "score";
+    sc.textContent = Number(ev.score).toFixed(1);
+    const bar = document.createElement("div");
+    bar.className = "score-bar";
+    const fill = document.createElement("i");
+    fill.style.width = Math.min(100, (ev.score / 9) * 100) + "%";
+    bar.appendChild(fill);
+    const arrow = document.createElement("div");
+    arrow.className = "row-arrow";
+    arrow.textContent = "↗";
+    right.append(sc, bar, arrow);
 
-    main.appendChild(card);
+    row.append(idx, mid, right);
+    list.appendChild(row);
   }
 }
 
+function boot(data) {
+  DATA = data;
+  const now = Date.now();
+  const upcoming = data.events.filter(e => e.start_utc && new Date(e.start_utc).getTime() > now);
+  const next = upcoming[0];
+  const top = data.events.reduce((a,b) => (b.score > (a?.score ?? -1) ? b : a), null);
+
+  document.getElementById("hudScore").textContent = top ? Number(top.score).toFixed(1) : "—";
+  document.getElementById("hudFeed").innerHTML =
+    `<span class="hud-detail">${data.events.length} tracked · ${data.events.filter(e=>e.score>=3).length} above threshold<br></span>Feed · Synced`;
+
+  if (next) {
+    const s = new Date(next.start_utc);
+    document.getElementById("nextText").textContent =
+      `Next · ${next.title} — ${fmtTime(s)}, ${relDay(s) || fmtDay(s)}`;
+    document.getElementById("nextLink").href = next.url || "#feed";
+    document.getElementById("nextLink").target = "_blank";
+  } else {
+    document.getElementById("nextText").textContent = "No upcoming events in the window.";
+  }
+
+  document.getElementById("bandCount").textContent = data.events.length;
+  document.getElementById("footCount").textContent = `${data.events.length} events tracked`;
+  const gen = new Date(data.generated_at);
+  document.getElementById("footUpdated").textContent =
+    "Updated " + new Intl.DateTimeFormat("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZone:TZ}).format(gen);
+
+  // marquee from the terms actually firing in the data
+  const counts = {};
+  data.events.forEach(e => cleanTerms(e.matched_terms).forEach(t => {
+    const k = t.replace(/^high:|^medium:/, "");
+    counts[k] = (counts[k] || 0) + 1;
+  }));
+  let terms = Object.entries(counts).sort((a,b) => b[1]-a[1]).map(([k]) => k);
+  if (terms.length < 6) terms = terms.concat(["robotics","career fair","internship","research","hackathon","scholarship"]);
+  terms = terms.slice(0, 14);
+  const track = document.getElementById("marquee");
+  const half = terms.map(t => `<span class="marquee-item">${t}</span>`).join("");
+  track.innerHTML = half + half;
+
+  render();
+}
+
 fetch("events.json?_=" + Date.now())
-  .then(r => { if (!r.ok) throw new Error("events.json not found"); return r.json(); })
-  .then(data => { currentData = data; render(); })
+  .then(r => { if (!r.ok) throw new Error("events.json unavailable"); return r.json(); })
+  .then(boot)
   .catch(err => {
-    document.getElementById("main").innerHTML =
-      `<p class="empty">Couldn't load events.json (${err.message}). The poller may not have run yet.</p>`;
+    document.getElementById("list").innerHTML =
+      `<div class="empty">Couldn't load the feed (${err.message}). The scheduled job may not have run yet.</div>`;
+    document.getElementById("nextText").textContent = "Feed unavailable.";
   });
 
 document.getElementById("search").addEventListener("input", render);
-document.getElementById("pills").addEventListener("click", e => {
-  const btn = e.target.closest(".pill");
-  if (!btn) return;
-  document.querySelectorAll(".pill").forEach(p => p.classList.remove("active"));
-  btn.classList.add("active");
-  minScore = parseFloat(btn.dataset.min);
+document.getElementById("seg").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  document.querySelectorAll("#seg button").forEach(x => x.classList.remove("on"));
+  b.classList.add("on");
+  minScore = parseFloat(b.dataset.min);
   render();
+});
+
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
+}, { threshold: 0.08, rootMargin: "0px 0px -40px 0px" });
+document.querySelectorAll(".rv").forEach((el, i) => {
+  el.style.transitionDelay = Math.min(i * 60, 240) + "ms";
+  io.observe(el);
 });
 </script>
 
