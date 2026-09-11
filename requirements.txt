@@ -1,0 +1,4 @@
+requests
+pyyaml
+mcp
+tzdata; sys_platform == "win32"
