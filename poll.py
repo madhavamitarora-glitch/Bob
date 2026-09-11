@@ -6,6 +6,7 @@ Usage:
 """
 
 import argparse
+import json
 import os
 import re
 import sqlite3
@@ -13,6 +14,7 @@ import sys
 import time
 from datetime import datetime, timedelta, timezone
 from html.parser import HTMLParser
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import requests
@@ -40,6 +42,9 @@ NTFY_BASE = "https://ntfy.sh"
 NTFY_TOPIC_ENV = "NTFY_TOPIC"
 MAX_NOTIFY_ITEMS = 5
 LOCAL_TZ = ZoneInfo("America/New_York")
+
+SITE_JSON_PATH = Path("docs/events.json")
+SITE_EXPORT_DAYS_AHEAD = 60
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS events (
@@ -314,6 +319,46 @@ def mark_notified(conn, localist_ids):
     conn.commit()
 
 
+def export_site_json(conn, out_path=SITE_JSON_PATH, days_ahead=SITE_EXPORT_DAYS_AHEAD):
+    """Dump upcoming events to a static JSON file for the GitHub Pages site
+    (docs/index.html) to fetch. No server involved - the site is pure
+    static HTML/JS reading this file, kept free via GitHub Pages."""
+    now = datetime.now(timezone.utc)
+    cutoff = now + timedelta(days=days_ahead)
+    rows = conn.execute(
+        """SELECT localist_id, title, description, start_utc, end_utc,
+                  location, group_name, url, score, matched_terms
+               FROM events
+               WHERE start_utc >= ? AND start_utc <= ?
+               ORDER BY start_utc ASC""",
+        (now.isoformat(), cutoff.isoformat()),
+    ).fetchall()
+
+    events = [
+        {
+            "localist_id": localist_id,
+            "title": title,
+            "description": description,
+            "start_utc": start_utc,
+            "end_utc": end_utc,
+            "location": location,
+            "group_name": group_name,
+            "url": url,
+            "score": score,
+            "matched_terms": matched_terms,
+        }
+        for localist_id, title, description, start_utc, end_utc, location,
+            group_name, url, score, matched_terms in rows
+    ]
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(
+        json.dumps({"generated_at": now.isoformat(), "events": events}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    return len(events)
+
+
 def send_notification(matches):
     """POST one batched ntfy push for up to MAX_NOTIFY_ITEMS matches.
     Sends nothing if there are no new matches (silence is correct).
@@ -389,6 +434,9 @@ def main():
             if score <= 0:
                 continue
             print(f"  {score:>4} | {title!r} | {matched_terms}")
+
+        exported = export_site_json(conn)
+        print(f"Exported {exported} upcoming event(s) to {SITE_JSON_PATH}")
 
         matches = select_new_matches(conn)
         if args.dry_run:

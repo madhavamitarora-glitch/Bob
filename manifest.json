@@ -1,0 +1,18 @@
+{
+  "manifest_version": "0.3",
+  "name": "bob",
+  "display_name": "Bob - Purdue Events",
+  "version": "1.0.0",
+  "description": "Read-only MCP server over Bob's local events.db of Purdue campus events.",
+  "author": {
+    "name": "Madhav Arora"
+  },
+  "server": {
+    "type": "python",
+    "entry_point": "mcp_server.py",
+    "mcp_config": {
+      "command": "C:\\Users\\madha\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "args": ["${__dirname}/mcp_server.py"]
+    }
+  }
+}

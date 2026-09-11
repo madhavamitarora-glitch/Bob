@@ -27,10 +27,10 @@ jobs:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: python poll.py
 
-      - name: Commit updated events.db
+      - name: Commit updated events.db and site data
         run: |
           git config user.name "bob-poller"
           git config user.email "bob-poller@users.noreply.github.com"
-          git add events.db
-          git diff --cached --quiet && echo "No changes to commit" || git commit -m "Update events.db [skip ci]"
+          git add events.db docs/events.json
+          git diff --cached --quiet && echo "No changes to commit" || git commit -m "Update events.db and site data [skip ci]"
           git push
