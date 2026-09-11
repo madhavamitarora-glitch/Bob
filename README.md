@@ -130,11 +130,14 @@ your topic — **the topic name is the entire access control**, so:
   [Android](https://play.google.com/store/apps/details?id=io.heckel.ntfy))
   and subscribe to that exact topic name.
 
-Each notification batches up to 5 new matches: title is just a count
-(`3 things at Purdue`), body is one line per event
-(`Title — Fri 3pm, WALC 1055`), and tapping the notification opens the
-Localist page for the top-scored match. On a quiet day, nothing is sent —
-silence is the correct output.
+Each notification batches up to 5 new matches: title is a count with an
+emoji that scales with how good the best match is (🔥 for a top score ≥6,
+⭐ for ≥4, 📅 otherwise — priority is set to match, so the strongest
+matches actually interrupt you and the routine ones don't), body is one
+bold line per event (`**Title** — Fri 3pm, WALC 1055`, rendered as
+Markdown), and tapping the notification opens the Localist page for the
+top-scored match. On a quiet day, nothing is sent — silence is the
+correct output.
 
 **A design choice worth knowing:** if more than 5 events clear the
 threshold in one run, only the top 5 (by score) appear in that run's

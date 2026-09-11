@@ -379,9 +379,20 @@ def send_notification(matches):
     shown = matches[:MAX_NOTIFY_ITEMS]
     count = len(shown)
     noun = "thing" if count == 1 else "things"
-    title = f"{count} {noun} at Purdue"
+    top_score = max(score for (_, _, score, _, _, _) in shown)
+
+    # Emoji + priority scale with how good the best match is, so a glance
+    # at the phone's lock screen already signals how worth opening this is.
+    if top_score >= 6:
+        emoji, priority = "\U0001F525", "5"  # fire, urgent
+    elif top_score >= 4:
+        emoji, priority = "⭐", "4"  # star, high
+    else:
+        emoji, priority = "\U0001F4C5", "3"  # calendar, default
+
+    title = f"{emoji} {count} {noun} at Purdue"
     lines = [
-        f"{ev_title} — {format_when(start_utc)}, {location or 'location TBD'}"
+        f"**{ev_title}** — {format_when(start_utc)}, {location or 'location TBD'}"
         for (_, ev_title, _, location, start_utc, _) in shown
     ]
     body = "\n".join(lines)
@@ -391,7 +402,13 @@ def send_notification(matches):
         resp = requests.post(
             f"{NTFY_BASE}/{topic}",
             data=body.encode("utf-8"),
-            headers={"Title": title.encode("utf-8"), "Click": click_url},
+            headers={
+                "Title": title.encode("utf-8"),
+                "Click": click_url,
+                "Markdown": "yes",
+                "Priority": priority,
+                "Tags": "bell",
+            },
             timeout=REQUEST_TIMEOUT,
         )
         resp.raise_for_status()
